@@ -122,4 +122,4 @@ MIT License - feel free to use this project for personal purposes.
 
 ## Author
 
-Emna ABBES - [Your GitHub](https://github.com/abbesemna)
+Emna ABBES - [abbesemna](https://github.com/abbesemna)

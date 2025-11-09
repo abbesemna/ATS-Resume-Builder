@@ -1,0 +1,37 @@
+/* Additional component-specific styles if needed */
+.App {
+  min-height: 100vh;
+}
+
+/* Custom focus ring color */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+}
+
+/* Smooth transitions */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* A4 Paper dimensions for accurate preview */
+.a4-preview {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  background: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+@media screen and (max-width: 768px) {
+  .a4-preview {
+    width: 100%;
+    min-height: auto;
+  }
+}

@@ -1,5 +1,47 @@
 import React, { useState, useRef } from 'react';
-import { Download, Plus, Trash2, Image as ImageIcon, X, FileText, User, Briefcase, GraduationCap, Award, Code, Link as LinkIcon } from 'lucide-react';
+import Select from 'react-select';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { 
+  FileText, Download, User, Briefcase, GraduationCap, Code, Award, 
+  ImageIcon, X, Plus, Trash2 
+} from 'lucide-react';
+
+const countryOptions = [
+  { value: 'Algeria', label: 'Algeria' },
+  { value: 'Bahrain', label: 'Bahrain' },
+  { value: 'Egypt', label: 'Egypt' },
+  { value: 'Iraq', label: 'Iraq' },
+  { value: 'Jordan', label: 'Jordan' },
+  { value: 'Kuwait', label: 'Kuwait' },
+  { value: 'Lebanon', label: 'Lebanon' },
+  { value: 'Libya', label: 'Libya' },
+  { value: 'Morocco', label: 'Morocco' },
+  { value: 'Oman', label: 'Oman' },
+  { value: 'Qatar', label: 'Qatar' },
+  { value: 'Saudi Arabia', label: 'Saudi Arabia' },
+  { value: 'Sudan', label: 'Sudan' },
+  { value: 'Syria', label: 'Syria' },
+  { value: 'Tunisia', label: 'Tunisia' },
+  { value: 'United Arab Emirates', label: 'United Arab Emirates' },
+  { value: 'France', label: 'France' },
+  { value: 'Germany', label: 'Germany' },
+  { value: 'Italy', label: 'Italy' },
+  { value: 'Spain', label: 'Spain' },
+  { value: 'United Kingdom', label: 'United Kingdom' },
+  { value: 'Turkey', label: 'Turkey' },
+  { value: 'Pakistan', label: 'Pakistan' },
+  { value: 'Indonesia', label: 'Indonesia' },
+  { value: 'Malaysia', label: 'Malaysia' },
+  { value: 'United States', label: 'United States' },
+  { value: 'Japan', label: 'Japan' },
+  { value: 'South Korea', label: 'South Korea' },
+  { value: 'India', label: 'India' },
+  { value: 'Vietnam', label: 'Vietnam' },
+  { value: 'Thailand', label: 'Thailand' }
+];
 
 const ResumeBuilder = () => {
   const [resumeData, setResumeData] = useState({
@@ -20,7 +62,7 @@ const ResumeBuilder = () => {
     certifications: [],
     languages: []
   });
-
+ 
   const [showPhotoInput, setShowPhotoInput] = useState(false);
   const [activeTab, setActiveTab] = useState('personal');
   const resumeRef = useRef(null);
@@ -105,16 +147,13 @@ const ResumeBuilder = () => {
   };
 
   const generatePDF = async () => {
-    const element = resumeRef.current;
-    const { jsPDF } = window.jspdf;
-    const html2canvas = window.html2canvas;
-
+    const element = document.getElementById('resume');
     const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff'
-    });
+    scale: 2,
+    useCORS: true,
+    logging: false,
+    backgroundColor: '#ffffff'
+  });
 
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'letter');
@@ -125,10 +164,12 @@ const ResumeBuilder = () => {
     const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
     const imgX = (pdfWidth - imgWidth * ratio) / 2;
     const imgY = 0;
+    
 
     pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
     pdf.save(`${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_Resume.pdf`);
   };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -140,7 +181,7 @@ const ResumeBuilder = () => {
               <FileText className="w-8 h-8 text-blue-600" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">ATS Resume Builder</h1>
-                <p className="text-sm text-gray-600">Canadian Format - Professional & ATS-Optimized</p>
+                <p className="text-sm text-gray-600">Professional & ATS-Optimized</p>
               </div>
             </div>
             <button
@@ -169,279 +210,287 @@ const ResumeBuilder = () => {
                   { id: 'other', label: 'Other', icon: Award }
                 ].map(tab => {
                   const Icon = tab.icon;
-                  return (
+                    return (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
                       className={`flex items-center space-x-2 px-6 py-4 font-medium transition-colors border-b-2 ${
-                        activeTab === tab.id
-                          ? 'border-blue-600 text-blue-600 bg-blue-50'
-                          : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      activeTab === tab.id
+                        ? 'border-blue-600 text-blue-600 bg-blue-50'
+                        : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
                       <span className="whitespace-nowrap">{tab.label}</span>
                     </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Input Forms */}
-            <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
-              {/* Personal Information */}
-              {activeTab === 'personal' && (
-                <div className="space-y-4">
-                  <h2 className="text-xl font-bold text-gray-900 border-b pb-2">Personal Information</h2>
-                  
-                  <div className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="Full Name *"
-                      value={resumeData.personalInfo.fullName}
-                      onChange={(e) => setResumeData({
-                        ...resumeData,
-                        personalInfo: { ...resumeData.personalInfo, fullName: e.target.value }
-                      })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    
-                    <input
-                      type="text"
-                      placeholder="Professional Title (e.g., Software Developer)"
-                      value={resumeData.personalInfo.title}
-                      onChange={(e) => setResumeData({
-                        ...resumeData,
-                        personalInfo: { ...resumeData.personalInfo, title: e.target.value }
-                      })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <input
-                        type="email"
-                        placeholder="Email *"
-                        value={resumeData.personalInfo.email}
-                        onChange={(e) => setResumeData({
-                          ...resumeData,
-                          personalInfo: { ...resumeData.personalInfo, email: e.target.value }
-                        })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                      
-                      <input
-                        type="tel"
-                        placeholder="Phone"
-                        value={resumeData.personalInfo.phone}
-                        onChange={(e) => setResumeData({
-                          ...resumeData,
-                          personalInfo: { ...resumeData.personalInfo, phone: e.target.value }
-                        })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                    
-                    <input
-                      type="text"
-                      placeholder="Location (City, Province)"
-                      value={resumeData.personalInfo.location}
-                      onChange={(e) => setResumeData({
-                        ...resumeData,
-                        personalInfo: { ...resumeData.personalInfo, location: e.target.value }
-                      })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    
-                    <input
-                      type="url"
-                      placeholder="LinkedIn URL"
-                      value={resumeData.personalInfo.linkedin}
-                      onChange={(e) => setResumeData({
-                        ...resumeData,
-                        personalInfo: { ...resumeData.personalInfo, linkedin: e.target.value }
-                      })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    
-                    <input
-                      type="url"
-                      placeholder="Website/Portfolio URL"
-                      value={resumeData.personalInfo.website}
-                      onChange={(e) => setResumeData({
-                        ...resumeData,
-                        personalInfo: { ...resumeData.personalInfo, website: e.target.value }
-                      })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    
-                    <div>
-                      <button
-                        onClick={() => setShowPhotoInput(!showPhotoInput)}
-                        className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium"
-                      >
-                        <ImageIcon className="w-5 h-5" />
-                        <span>{showPhotoInput ? 'Hide' : 'Add'} Professional Photo (Optional)</span>
-                      </button>
-                      
-                      {showPhotoInput && (
-                        <div className="mt-3">
-                          {resumeData.personalInfo.photo ? (
-                            <div className="flex items-center space-x-4">
-                              <img
-                                src={resumeData.personalInfo.photo}
-                                alt="Profile"
-                                className="w-20 h-20 rounded-lg object-cover border-2 border-gray-200"
-                              />
-                              <button
-                                onClick={removePhoto}
-                                className="flex items-center space-x-2 text-red-600 hover:text-red-700"
-                              >
-                                <X className="w-4 h-4" />
-                                <span>Remove</span>
-                              </button>
-                            </div>
-                          ) : (
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={handlePhotoUpload}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Professional Summary
-                    </label>
-                    <textarea
-                      value={resumeData.summary}
-                      onChange={(e) => setResumeData({ ...resumeData, summary: e.target.value })}
-                      placeholder="Brief overview of your professional background, key skills, and career objectives..."
-                      rows="5"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    );
+                  })}
                   </div>
                 </div>
-              )}
 
-              {/* Experience */}
-              {activeTab === 'experience' && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between border-b pb-2">
-                    <h2 className="text-xl font-bold text-gray-900">Work Experience</h2>
-                    <button
-                      onClick={addExperience}
-                      className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>Add</span>
-                    </button>
-                  </div>
-                  
-                  {resumeData.experience.map((exp, index) => (
-                    <div key={exp.id} className="p-4 border border-gray-200 rounded-lg space-y-3 bg-gray-50">
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-semibold text-gray-900">Position {index + 1}</h3>
-                        <button
-                          onClick={() => setResumeData({
-                            ...resumeData,
-                            experience: resumeData.experience.filter(e => e.id !== exp.id)
-                          })}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                      
-                      <input
-                        type="text"
-                        placeholder="Job Title *"
-                        value={exp.title}
-                        onChange={(e) => {
-                          const updated = resumeData.experience.map(item =>
-                            item.id === exp.id ? { ...item, title: e.target.value } : item
-                          );
-                          setResumeData({ ...resumeData, experience: updated });
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                      
-                      <input
-                        type="text"
-                        placeholder="Company Name *"
-                        value={exp.company}
-                        onChange={(e) => {
-                          const updated = resumeData.experience.map(item =>
-                            item.id === exp.id ? { ...item, company: e.target.value } : item
-                          );
-                          setResumeData({ ...resumeData, experience: updated });
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                      
-                      <input
-                        type="text"
-                        placeholder="Location"
-                        value={exp.location}
-                        onChange={(e) => {
-                          const updated = resumeData.experience.map(item =>
-                            item.id === exp.id ? { ...item, location: e.target.value } : item
-                          );
-                          setResumeData({ ...resumeData, experience: updated });
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                      
-                      <div className="grid grid-cols-2 gap-3">
+                {/* Input Forms */}
+                <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+                  {activeTab === 'personal' && (
+                    <div className="space-y-4">
+                      <h2 className="text-xl font-bold text-gray-900 border-b pb-2">Personal Information</h2>
+
+                      <div className="space-y-4">
                         <input
                           type="text"
-                          placeholder="Start Date (MM/YYYY)"
-                          value={exp.startDate}
-                          onChange={(e) => {
+                          placeholder="Full Name *"
+                          value={resumeData.personalInfo.fullName}
+                          onChange={(e) =>
+                            setResumeData({
+                              ...resumeData,
+                              personalInfo: { ...resumeData.personalInfo, fullName: e.target.value }
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+
+                        <input
+                          type="text"
+                          placeholder="Professional Title (e.g., Software Developer)"
+                          value={resumeData.personalInfo.title}
+                          onChange={(e) =>
+                            setResumeData({
+                              ...resumeData,
+                              personalInfo: { ...resumeData.personalInfo, title: e.target.value }
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <input
+                            type="email"
+                            placeholder="Email *"
+                            value={resumeData.personalInfo.email}
+                            onChange={(e) =>
+                              setResumeData({
+                                ...resumeData,
+                                personalInfo: { ...resumeData.personalInfo, email: e.target.value }
+                              })
+                            }
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+
+                          <input
+                            type="tel"
+                            placeholder="Phone"
+                            value={resumeData.personalInfo.phone}
+                            onChange={(e) =>
+                              setResumeData({
+                                ...resumeData,
+                                personalInfo: { ...resumeData.personalInfo, phone: e.target.value }
+                              })
+                            }
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+
+                        <Select
+                          options={countryOptions}
+                          value={countryOptions.find(option => option.value === resumeData.personalInfo.country)}
+                          onChange={(selected) =>
+                            setResumeData({
+                              ...resumeData,
+                              personalInfo: { ...resumeData.personalInfo, country: selected.value }
+                            })
+                          }
+                        />
+
+                        <input
+                          type="url"
+                          placeholder="LinkedIn URL"
+                          value={resumeData.personalInfo.linkedin}
+                          onChange={(e) =>
+                            setResumeData({
+                              ...resumeData,
+                              personalInfo: { ...resumeData.personalInfo, linkedin: e.target.value }
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+
+                        <input
+                          type="url"
+                          placeholder="Website/Portfolio URL"
+                          value={resumeData.personalInfo.website}
+                          onChange={(e) =>
+                            setResumeData({
+                              ...resumeData,
+                              personalInfo: { ...resumeData.personalInfo, website: e.target.value }
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+
+                        <div>
+                          <button
+                            onClick={() => setShowPhotoInput(!showPhotoInput)}
+                            className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium"
+                          >
+                            <ImageIcon className="w-5 h-5" />
+                            <span>{showPhotoInput ? 'Hide' : 'Add'} Professional Photo (Optional)</span>
+                          </button>
+
+                          {showPhotoInput && (
+                            <div className="mt-3">
+                              {resumeData.personalInfo.photo ? (
+                                <div className="flex items-center space-x-4">
+                                  <img
+                                    src={resumeData.personalInfo.photo}
+                                    alt="Profile"
+                                    className="w-20 h-20 rounded-lg object-cover border-2 border-gray-200"
+                                  />
+                                  <button
+                                    onClick={removePhoto}
+                                    className="flex items-center space-x-2 text-red-600 hover:text-red-700"
+                                  >
+                                    <X className="w-4 h-4" />
+                                    <span>Remove</span>
+                                  </button>
+                                </div>
+                              ) : (
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handlePhotoUpload}
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Professional Summary</label>
+                        <textarea
+                          value={resumeData.summary}
+                          onChange={(e) => setResumeData({ ...resumeData, summary: e.target.value })}
+                          placeholder="Brief overview of your professional background, key skills, and career objectives..."
+                          rows="5"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'experience' && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <h2 className="text-xl font-bold text-gray-900">Work Experience</h2>
+                        <button
+                          onClick={addExperience}
+                          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Add</span>
+                        </button>
+                      </div>
+
+                      {resumeData.experience.map((exp, index) => (
+                        <div key={exp.id} className="p-4 border border-gray-200 rounded-lg space-y-3 bg-gray-50">
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-semibold text-gray-900">Position {index + 1}</h3>
+                            <button
+                              onClick={() =>
+                                setResumeData({
+                                  ...resumeData,
+                                  experience: resumeData.experience.filter((e) => e.id !== exp.id)
+                                })
+                              }
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          <input
+                            type="text"
+                            placeholder="Job Title *"
+                            value={exp.title}
+                            onChange={(e) => {
+                              const updated = resumeData.experience.map((item) =>
+                                item.id === exp.id ? { ...item, title: e.target.value } : item
+                              );
+                              setResumeData({ ...resumeData, experience: updated });
+                              }}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
+                              <input
+                              type="text"
+                              placeholder="Company Name *"
+                              value={exp.company}
+                              onChange={(e) => {
+                                const updated = resumeData.experience.map(item =>
+                                  item.id === exp.id ? { ...item, company: e.target.value } : item
+                                );
+                                setResumeData({ ...resumeData, experience: updated });
+                              }}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
+
+                              <input
+                              type="text"
+                              placeholder="Location"
+                              value={exp.location}
+                              onChange={(e) => {
                             const updated = resumeData.experience.map(item =>
-                              item.id === exp.id ? { ...item, startDate: e.target.value } : item
+                            item.id === exp.id ? { ...item, location: e.target.value } : item
                             );
                             setResumeData({ ...resumeData, experience: updated });
                           }}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                        
-                        <input
-                          type="text"
-                          placeholder="End Date (MM/YYYY)"
-                          value={exp.endDate}
-                          onChange={(e) => {
+                          />
+                          <div className="grid grid-cols-2 gap-3">
+                          <input
+                            type="text"
+                            placeholder="Start Date (MM/YYYY)"
+                            value={exp.startDate}
+                            onChange={(e) => {
+                            const updated = resumeData.experience.map(item =>
+                              item.id === exp.id ? { ...item, startDate: e.target.value } : item
+                            );
+                            setResumeData({ ...resumeData, experience: updated });
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                          
+                          <input
+                            type="text"
+                            placeholder="End Date (MM/YYYY)"
+                            value={exp.endDate}
+                            onChange={(e) => {
                             const updated = resumeData.experience.map(item =>
                               item.id === exp.id ? { ...item, endDate: e.target.value } : item
                             );
                             setResumeData({ ...resumeData, experience: updated });
-                          }}
-                          disabled={exp.current}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
-                        />
-                      </div>
-                      
-                      <label className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          checked={exp.current}
-                          onChange={(e) => {
+                            }}
+                            disabled={exp.current}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                          />
+                          </div>
+                          
+                          <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={exp.current}
+                            onChange={(e) => {
                             const updated = resumeData.experience.map(item =>
                               item.id === exp.id ? { ...item, current: e.target.checked, endDate: e.target.checked ? 'Present' : '' } : item
                             );
                             setResumeData({ ...resumeData, experience: updated });
-                          }}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-700">Currently working here</span>
-                      </label>
-                      
-                      <textarea
-                        value={exp.description}
+                            }}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">Currently working here</span>
+                          </label>
+                          
+                          <textarea
+                          value={exp.description}
                         onChange={(e) => {
                           const updated = resumeData.experience.map(item =>
                             item.id === exp.id ? { ...item, description: e.target.value } : item

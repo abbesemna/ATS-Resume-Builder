@@ -116,9 +116,7 @@ All data is stored locally in your browser. Nothing is sent to any server.
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
-
-MIT License - feel free to use this project for personal purposes.
+Feel free to use this project for personal purposes.
 
 ## Author
 

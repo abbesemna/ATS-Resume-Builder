@@ -158,69 +158,85 @@ const App = () => {
         doc.addImage(personalInfo.photo, 'JPEG', pageWidth - margin - 25, margin, 25, 25, '', 'FAST');
       } catch (e) {
         console.error('Photo error:', e);
-      }
-    }
+            }
+          }
 
-    // Name
-    doc.setFontSize(20);
-    doc.setFont('times', 'bold');
-    doc.text(personalInfo.fullName || 'Your Name', margin, yPosition);
-    yPosition += 8;
+          // Name
+          doc.setFontSize(20);
+          doc.setFont('times', 'bold');
+          doc.setTextColor(0, 0, 0);
+          doc.text(personalInfo.fullName || 'Your Name', margin, yPosition);
+          yPosition += 6;
 
-    // Title
-    if (personalInfo.title) {
-      doc.setFontSize(12);
-      doc.setFont('times', 'italic');
-      doc.setTextColor(80, 80, 80);
-      doc.text(personalInfo.title, margin, yPosition);
-      yPosition += 6;
-    }
+          // Title
+          if (personalInfo.title) {
+            doc.setFontSize(12);
+            doc.setFont('times', 'italic');
+            doc.setTextColor(80, 80, 80);
+            doc.text(personalInfo.title, margin, yPosition);
+            yPosition += 6;
+          }
 
-    // Contact info
-    doc.setFontSize(10);
-    doc.setFont('times', 'normal');
-    doc.setTextColor(60, 60, 60);
-    
-    const contactInfo = [
-      personalInfo.email,
-      personalInfo.phone,
-      personalInfo.location
-    ].filter(Boolean).join(' | ');
-    
-    if (contactInfo) {
-      doc.text(contactInfo, margin, yPosition);
-      yPosition += 5;
-    }
+          // Contact info + links (all in one line)
+          doc.setFontSize(10);
+          doc.setFont('times', 'normal');
+          doc.setTextColor(60, 60, 60);
 
-    // Links
-    if (personalInfo.linkedin) {
-      doc.setTextColor(0, 102, 204);
-      doc.textWithLink('LinkedIn', margin, yPosition, { url: personalInfo.linkedin });
-      yPosition += 5;
-    }
-    
-    if (personalInfo.website) {
-      doc.setTextColor(0, 102, 204);
-      doc.textWithLink('Portfolio', margin, yPosition, { url: personalInfo.website });
-      yPosition += 5;
-    }
+          // Build contact and link line
+          const parts = [];
 
-    yPosition += 5;
-    doc.setTextColor(0, 0, 0);
+          if (personalInfo.email) parts.push(personalInfo.email);
+          if (personalInfo.phone) parts.push(personalInfo.phone);
+          if (personalInfo.location) parts.push(personalInfo.location);
+
+          // For clickable links, we will draw them separately but include placeholders in text
+          if (personalInfo.linkedin) parts.push('LinkedIn');
+          if (personalInfo.github) parts.push('GitHub'); // Added GitHub support
+          if (personalInfo.website) parts.push('Portfolio');
+
+          const contactLine = parts.join(' | ');
+          doc.text(contactLine, margin, yPosition);
+
+          // Make "LinkedIn" and "GitHub" clickable
+          let xCursor = margin;
+          const items = contactLine.split(' | ');
+          items.forEach(item => {
+            const itemWidth = doc.getTextWidth(item);
+            
+            if (item === 'LinkedIn' && personalInfo.linkedin) {
+        doc.setTextColor(0, 102, 204);
+        doc.textWithLink(item, xCursor, yPosition, { url: personalInfo.linkedin });
+            } else if (item === 'GitHub' && personalInfo.github) {
+        doc.setTextColor(0, 102, 204);
+        doc.textWithLink(item, xCursor, yPosition, { url: personalInfo.github });
+            } else if (item === 'Portfolio' && personalInfo.website) {
+        doc.setTextColor(0, 102, 204);
+        doc.textWithLink(item, xCursor, yPosition, { url: personalInfo.website });
+            } else {
+        doc.setTextColor(60, 60, 60);
+        doc.text(item, xCursor, yPosition);
+            }
+
+            xCursor += itemWidth + doc.getTextWidth(' | ');
+          });
+
+          yPosition += 4;
+          yPosition += 4;
+          doc.setTextColor(0, 0, 0);
 
     // Summary
     if (summary) {
       checkPageBreak(20);
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont('times', 'bold');
-      doc.text('PROFESSIONAL SUMMARY', margin, yPosition);
+      doc.text('SUMMARY', margin, yPosition);
       yPosition += 2;
       
       const rgb = hexToRgb(accentColor);
       doc.setDrawColor(rgb.r, rgb.g, rgb.b);
-      doc.setLineWidth(0.5);
+      doc.setLineWidth(0.35);
       doc.line(margin, yPosition, pageWidth - margin, yPosition);
-      yPosition += 6;
+      yPosition += 5;
       
       doc.setFontSize(10);
       doc.setFont('times', 'normal');
@@ -232,7 +248,7 @@ const App = () => {
     // Experience
     if (experience.length > 0) {
       checkPageBreak(20);
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont('times', 'bold');
       doc.text('WORK EXPERIENCE', margin, yPosition);
       yPosition += 2;
@@ -240,7 +256,7 @@ const App = () => {
       const rgb = hexToRgb(accentColor);
       doc.setDrawColor(rgb.r, rgb.g, rgb.b);
       doc.line(margin, yPosition, pageWidth - margin, yPosition);
-      yPosition += 6;
+      yPosition += 5;
 
       experience.forEach((exp) => {
         checkPageBreak(25);
@@ -284,7 +300,7 @@ const App = () => {
     // Education
     if (education.length > 0) {
       checkPageBreak(20);
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont('times', 'bold');
       doc.text('EDUCATION', margin, yPosition);
       yPosition += 2;
@@ -335,7 +351,7 @@ const App = () => {
     // Projects
     if (projects.length > 0) {
       checkPageBreak(20);
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont('times', 'bold');
       doc.text('PROJECTS', margin, yPosition);
       yPosition += 2;
@@ -382,7 +398,7 @@ const App = () => {
     // Skills
     if (skills.length > 0) {
       checkPageBreak(20);
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont('times', 'bold');
       doc.text('SKILLS', margin, yPosition);
       yPosition += 2;
@@ -410,15 +426,15 @@ const App = () => {
           doc.text(skillLines, margin, yPosition);
           yPosition += skillLines.length * 4.5;
         }
-        yPosition += 1;
+        yPosition += 3;
       });
-      yPosition += 2;
+      yPosition += 4;
     }
 
     // Certifications
     if (certifications.length > 0) {
       checkPageBreak(20);
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont('times', 'bold');
       doc.text('CERTIFICATIONS', margin, yPosition);
       yPosition += 2;
@@ -470,7 +486,7 @@ const App = () => {
     // Languages
     if (languages.length > 0) {
       checkPageBreak(15);
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont('times', 'bold');
       doc.text('LANGUAGES', margin, yPosition);
       yPosition += 2;
@@ -702,7 +718,7 @@ const App = () => {
                   
                   <div>
                     <label className={`block text-sm font-medium ${textSecondary} mb-2`}>
-                      Professional Summary
+                      Summary
                     </label>
                     <textarea
                       value={resumeData.summary}
